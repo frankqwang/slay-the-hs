@@ -287,13 +287,13 @@ unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.64
-anchor_top = 0.26
+anchor_top = 0.22
 anchor_right = 0.96
-anchor_bottom = 0.84
+anchor_bottom = 0.67
 offset_left = -29.76001
 offset_top = 1.5599976
 offset_right = -91.76001
-offset_bottom = -42.440002
+offset_bottom = -18.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
@@ -309,182 +309,6 @@ size_flags_horizontal = 3
 theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 6
 columns = 2
-
-[node name="EnemyCardPreviewA" type="PanelContainer" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid"]
-custom_minimum_size = Vector2(196, 228)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="EnemyCardPadA" type="MarginContainer" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewA"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 6
-
-[node name="EnemyCardVBoxA" type="VBoxContainer" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewA/EnemyCardPadA"]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="IntentA" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewA/EnemyCardPadA/EnemyCardVBoxA"]
-layout_mode = 2
-text = "ATK 10"
-
-[node name="PortraitBgA" type="ColorRect" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewA/EnemyCardPadA/EnemyCardVBoxA"]
-custom_minimum_size = Vector2(0, 112)
-layout_mode = 2
-color = Color(0.17, 0.24, 0.31, 1)
-
-[node name="PortraitA" type="TextureRect" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewA/EnemyCardPadA/EnemyCardVBoxA/PortraitBgA"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="HpTextA" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewA/EnemyCardPadA/EnemyCardVBoxA"]
-layout_mode = 2
-text = "43/43"
-horizontal_alignment = 1
-
-[node name="HpBarA" type="ProgressBar" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewA/EnemyCardPadA/EnemyCardVBoxA"]
-custom_minimum_size = Vector2(0, 12)
-layout_mode = 2
-value = 100.0
-show_percentage = false
-
-[node name="NameA" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewA/EnemyCardPadA/EnemyCardVBoxA"]
-layout_mode = 2
-text = "Cultist A"
-horizontal_alignment = 1
-
-[node name="StatusA" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewA/EnemyCardPadA/EnemyCardVBoxA"]
-layout_mode = 2
-text = "BLK 0  STR 0  VUL 0"
-horizontal_alignment = 1
-
-[node name="EnemyCardPreviewB" type="PanelContainer" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid"]
-custom_minimum_size = Vector2(196, 228)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="EnemyCardPadB" type="MarginContainer" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewB"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 6
-
-[node name="EnemyCardVBoxB" type="VBoxContainer" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewB/EnemyCardPadB"]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="IntentB" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewB/EnemyCardPadB/EnemyCardVBoxB"]
-layout_mode = 2
-text = "BLK 6"
-
-[node name="PortraitBgB" type="ColorRect" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewB/EnemyCardPadB/EnemyCardVBoxB"]
-custom_minimum_size = Vector2(0, 112)
-layout_mode = 2
-color = Color(0.17, 0.24, 0.31, 1)
-
-[node name="PortraitB" type="TextureRect" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewB/EnemyCardPadB/EnemyCardVBoxB/PortraitBgB"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="HpTextB" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewB/EnemyCardPadB/EnemyCardVBoxB"]
-layout_mode = 2
-text = "43/43"
-horizontal_alignment = 1
-
-[node name="HpBarB" type="ProgressBar" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewB/EnemyCardPadB/EnemyCardVBoxB"]
-custom_minimum_size = Vector2(0, 12)
-layout_mode = 2
-value = 100.0
-show_percentage = false
-
-[node name="NameB" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewB/EnemyCardPadB/EnemyCardVBoxB"]
-layout_mode = 2
-text = "Cultist B"
-horizontal_alignment = 1
-
-[node name="StatusB" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyRosterGrid/EnemyCardPreviewB/EnemyCardPadB/EnemyCardVBoxB"]
-layout_mode = 2
-text = "BLK 0  STR 0  VUL 0"
-horizontal_alignment = 1
-
-[node name="EnemyBody" type="PanelContainer" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox"]
-visible = false
-custom_minimum_size = Vector2(220, 64)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_chip")
-
-[node name="EnemyBodyLabel" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyBody"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "ENEMY"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="EnemySprite" type="ColorRect" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 104)
-layout_mode = 2
-color = Color(0.17, 0.24, 0.31, 1)
-
-[node name="EnemyPortrait" type="TextureRect" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemySprite"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="EnemyStatRow" type="HBoxContainer" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox"]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="EnemyHpBar" type="ProgressBar" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyStatRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-value = 100.0
-show_percentage = false
-
-[node name="EnemyIntentBadge" type="PanelContainer" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyStatRow"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="EnemyIntentHBox" type="HBoxContainer" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyStatRow/EnemyIntentBadge"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="EnemyIntentIcon" type="TextureRect" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyStatRow/EnemyIntentBadge/EnemyIntentHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(18, 18)
-layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="EnemyIntentValue" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox/EnemyStatRow/EnemyIntentBadge/EnemyIntentHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "0"
 
 [node name="DropHintLabel" type="Label" parent="MainMargin/MainVBox/Arena/EnemyDropArea/DropVBox"]
 unique_name_in_owner = true

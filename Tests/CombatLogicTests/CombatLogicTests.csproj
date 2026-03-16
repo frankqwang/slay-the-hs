@@ -7,10 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\Scripts\CardCatalog.cs" Link="CardCatalog.cs" />
+    <Compile Include="..\..\Scripts\CardData.cs" Link="CardData.cs" />
+    <Compile Include="..\..\Scripts\CardEffectSpec.cs" Link="CardEffectSpec.cs" />
+    <Compile Include="..\..\Scripts\CardEffectType.cs" Link="CardEffectType.cs" />
     <Compile Include="..\..\Scripts\CombatResolver.cs" Link="CombatResolver.cs" />
     <Compile Include="..\..\Scripts\DeckFlowResolver.cs" Link="DeckFlowResolver.cs" />
+    <Compile Include="..\..\Scripts\EnemyCatalog.cs" Link="EnemyCatalog.cs" />
+    <Compile Include="..\..\Scripts\EnemyEncounterBuilder.cs" Link="EnemyEncounterBuilder.cs" />
     <Compile Include="..\..\Scripts\EnemyIntentType.cs" Link="EnemyIntentType.cs" />
+    <Compile Include="..\..\Scripts\EnemyUnit.cs" Link="EnemyUnit.cs" />
     <Compile Include="..\..\Scripts\IntentResolver.cs" Link="IntentResolver.cs" />
+    <Compile Include="..\..\Scripts\MapNodeType.cs" Link="MapNodeType.cs" />
     <Compile Include="..\..\Scripts\TurnFlowResolver.cs" Link="TurnFlowResolver.cs" />
   </ItemGroup>
 </Project>

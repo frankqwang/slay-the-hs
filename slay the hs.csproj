@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Scenes\BattleScene.tscn" />
+    <Content Include="Scenes\EnemyCardView.tscn" />
     <Content Include="Scenes\EventScene.tscn" />
     <Content Include="Scenes\MainMenu.tscn" />
     <Content Include="Scenes\MapScene.tscn" />

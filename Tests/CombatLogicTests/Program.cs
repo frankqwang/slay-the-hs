@@ -22,7 +22,12 @@ internal static class Program
             ("Draw halts when no cards available", TestDrawHaltsWhenNoCards),
             ("Normal intent values stay in expected ranges", TestNormalIntentRanges),
             ("Elite intent values stay in expected ranges", TestEliteIntentRanges),
-            ("Elite attack rate is higher than normal", TestEliteAttackRateHigher)
+            ("Elite attack rate is higher than normal", TestEliteAttackRateHigher),
+            ("Normal encounter roster scales by floor", TestNormalEncounterRoster),
+            ("Elite encounter roster uses sentinel archetype", TestEliteEncounterRoster),
+            ("Card catalog starter/reward pools are config-driven", TestCardCatalogPools),
+            ("Card effects preserve expected sequence", TestCardEffectSequence),
+            ("Enemy catalog rules match encounter expectations", TestEnemyCatalogRules)
         };
 
         var failed = 0;
@@ -306,6 +311,70 @@ internal static class Program
             throw new InvalidOperationException(
                 $"elite attack rate should be higher than normal: elite={eliteRate:F3}, normal={normalRate:F3}");
         }
+    }
+
+    private static void TestNormalEncounterRoster()
+    {
+        var early = EnemyEncounterBuilder.BuildEncounter(MapNodeType.NormalBattle, floor: 1);
+        ExpectEqual(2, early.Count, "early.Count");
+        ExpectEqual("Cultist A", early[0].Name, "early[0].Name");
+        ExpectEqual(43, early[0].Hp, "early[0].Hp");
+
+        var later = EnemyEncounterBuilder.BuildEncounter(MapNodeType.NormalBattle, floor: 3);
+        ExpectEqual(3, later.Count, "later.Count");
+        ExpectEqual("Cultist C", later[2].Name, "later[2].Name");
+        ExpectEqual(50, later[2].Hp, "later[2].Hp");
+    }
+
+    private static void TestEliteEncounterRoster()
+    {
+        var roster = EnemyEncounterBuilder.BuildEncounter(MapNodeType.EliteBattle, floor: 4);
+        ExpectEqual(2, roster.Count, "roster.Count");
+        ExpectEqual("Elite Sentinel A", roster[0].Name, "roster[0].Name");
+        ExpectEqual("elite_sentinel", roster[0].VisualId, "roster[0].VisualId");
+        ExpectEqual(118, roster[0].Hp, "roster[0].Hp");
+        ExpectEqual(2, roster[0].Strength, "roster[0].Strength");
+    }
+
+    private static void TestCardCatalogPools()
+    {
+        var starter = CardData.StarterDeckIds();
+        ExpectEqual(11, starter.Count, "starter.Count");
+        ExpectEqual("bash", starter[10], "starter[10]");
+
+        var rewards = CardData.RewardPoolIds();
+        ExpectEqual(6, rewards.Count, "rewards.Count");
+        ExpectEqual("heavy_slash", rewards[0], "rewards[0]");
+    }
+
+    private static void TestCardEffectSequence()
+    {
+        var bash = CardData.CreateById("bash");
+        ExpectEqual(2, bash.Effects.Count, "bash.Effects.Count");
+        ExpectEqual(true, bash.Effects[0].Type == CardEffectType.DealDamage, "bash.effects[0].type");
+        ExpectEqual(true, bash.Effects[1].Type == CardEffectType.ApplyVulnerable, "bash.effects[1].type");
+
+        var quickSlash = CardData.CreateById("quick_slash");
+        ExpectEqual(2, quickSlash.Effects.Count, "quickSlash.Effects.Count");
+        ExpectEqual(true, quickSlash.Effects[0].Type == CardEffectType.DealDamage, "quickSlash.effects[0].type");
+        ExpectEqual(true, quickSlash.Effects[1].Type == CardEffectType.DrawCards, "quickSlash.effects[1].type");
+        ExpectEqual(7, quickSlash.Damage, "quickSlash.Damage");
+        ExpectEqual(1, quickSlash.DrawCount, "quickSlash.DrawCount");
+    }
+
+    private static void TestEnemyCatalogRules()
+    {
+        var normalRules = EnemyCatalog.GetEncounterRules(MapNodeType.NormalBattle);
+        ExpectEqual(3, normalRules.Count, "normalRules.Count");
+        ExpectEqual("cultist", normalRules[0].ArchetypeId, "normalRules[0].ArchetypeId");
+
+        var eliteRules = EnemyCatalog.GetEncounterRules(MapNodeType.EliteBattle);
+        ExpectEqual(2, eliteRules.Count, "eliteRules.Count");
+        ExpectEqual("elite_sentinel", eliteRules[0].ArchetypeId, "eliteRules[0].ArchetypeId");
+
+        var sentinel = EnemyCatalog.GetArchetype("elite_sentinel");
+        ExpectEqual("Elite Sentinel", sentinel.DisplayName, "sentinel.DisplayName");
+        ExpectEqual(3, sentinel.StrengthByFloor(6), "sentinel.StrengthByFloor(6)");
     }
 
     private static void ExpectEqual(int expected, int actual, string label)
