@@ -12,6 +12,9 @@
     <Content Include="Data\enemies.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\relics.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scenes\BattleScene.tscn" />
     <Content Include="Scenes\CardEditorScene.tscn" />
     <Content Include="Scenes\EnemyCardView.tscn" />
@@ -19,6 +22,7 @@
     <Content Include="Scenes\MainMenu.tscn" />
     <Content Include="Scenes\MapScene.tscn" />
     <Content Include="Scenes\PlayerCardView.tscn" />
+    <Content Include="Scenes\RelicCompendiumScene.tscn" />
     <Content Include="Scenes\RelicRewardScene.tscn" />
     <Content Include="Scenes\RewardScene.tscn" />
   </ItemGroup>

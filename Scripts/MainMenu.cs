@@ -6,6 +6,7 @@ public partial class MainMenu : Control
     private Button _quitButton = null!;
     private Button _languageButton = null!;
     private Button _cardEditorButton = null!;
+    private Button _relicCompendiumButton = null!;
 
     public override void _Ready()
     {
@@ -13,11 +14,13 @@ public partial class MainMenu : Control
         _quitButton = GetNode<Button>("%QuitButton");
         _languageButton = GetNode<Button>("%LanguageButton");
         _cardEditorButton = GetNode<Button>("%CardEditorButton");
+        _relicCompendiumButton = GetNode<Button>("%RelicCompendiumButton");
 
         _startButton.Pressed += OnStartPressed;
         _quitButton.Pressed += OnQuitPressed;
         _languageButton.Pressed += OnLanguagePressed;
         _cardEditorButton.Pressed += OnCardEditorPressed;
+        _relicCompendiumButton.Pressed += OnRelicCompendiumPressed;
 
         RefreshLanguageButtonText();
     }
@@ -37,6 +40,11 @@ public partial class MainMenu : Control
     private void OnCardEditorPressed()
     {
         GetTree().ChangeSceneToFile("res://Scenes/CardEditorScene.tscn");
+    }
+
+    private void OnRelicCompendiumPressed()
+    {
+        GetTree().ChangeSceneToFile("res://Scenes/RelicCompendiumScene.tscn");
     }
 
     private void OnLanguagePressed()

@@ -1,0 +1,28 @@
+{
+  "relics": [
+    { "id": "lantern", "name": "Lantern", "description": "Gain +1 Energy on turn 1.", "rarity": "Starter", "archetype": "Tempo" },
+    { "id": "anchor", "name": "Anchor", "description": "Gain 8 Block on turn 1.", "rarity": "Starter", "archetype": "Block" },
+    { "id": "whetstone", "name": "Whetstone", "description": "Your attacks deal +1 damage.", "rarity": "Common", "archetype": "Strike" },
+    { "id": "charm", "name": "Lucky Charm", "description": "Heal 5 HP after each battle.", "rarity": "Common", "archetype": "Sustain" },
+    { "id": "ember_ring", "name": "Ember Ring", "description": "Gain +1 Energy at the start of every turn.", "rarity": "Rare", "archetype": "Combo" },
+    { "id": "iron_shell", "name": "Iron Shell", "description": "Gain 3 Block at the start of every turn.", "rarity": "Rare", "archetype": "Block" },
+    { "id": "blood_vial", "name": "Blood Vial", "description": "Heal 2 HP after each battle.", "rarity": "Uncommon", "archetype": "Sustain" },
+
+    { "id": "storm_feather", "name": "Storm Feather", "description": "Whenever you play your 3rd card each turn, gain 1 Energy next turn.", "rarity": "Uncommon", "archetype": "Combo" },
+    { "id": "rune_kite", "name": "Rune Kite", "description": "When you discard 2+ cards in one turn, gain 4 Block.", "rarity": "Uncommon", "archetype": "Discard" },
+    { "id": "cinder_tea", "name": "Cinder Tea", "description": "After combat, if you lost HP this fight, heal 3 HP.", "rarity": "Common", "archetype": "Sustain" },
+    { "id": "thorn_mail", "name": "Thorn Mail", "description": "When attacked, deal 2 damage back to the attacker.", "rarity": "Uncommon", "archetype": "Thorns" },
+    { "id": "frozen_lens", "name": "Frozen Lens", "description": "The first debuff card you play each turn applies +1 stack.", "rarity": "Rare", "archetype": "Debuff" },
+    { "id": "echo_coin", "name": "Echo Coin", "description": "Every 5 cards played in combat, draw 1 card.", "rarity": "Common", "archetype": "Draw" },
+    { "id": "twin_blade_badge", "name": "Twin Blade Badge", "description": "The first Attack each turn hits twice for 60% damage.", "rarity": "Rare", "archetype": "Strike" },
+    { "id": "warding_bell", "name": "Warding Bell", "description": "If your turn ends with 0 Block, gain 6 Block.", "rarity": "Common", "archetype": "Block" },
+    { "id": "soul_compass", "name": "Soul Compass", "description": "Elite rewards offer one extra relic option.", "rarity": "Boss", "archetype": "Greed" },
+
+    { "id": "overclock_core", "name": "Overclock Core", "description": "Every 4th Skill each combat costs 0.", "rarity": "Uncommon", "archetype": "Skill-Loop" },
+    { "id": "glass_meteor", "name": "Glass Meteor", "description": "Attacks deal +3 damage, but you take +1 damage from enemy attacks.", "rarity": "Rare", "archetype": "Glass Cannon" },
+    { "id": "dawn_totem", "name": "Dawn Totem", "description": "At turn 1, draw 1 extra card and gain 4 Block.", "rarity": "Starter", "archetype": "Tempo" },
+    { "id": "void_hourglass", "name": "Void Hourglass", "description": "At the end of your turn, if you played no Attack, gain 1 Strength.", "rarity": "Rare", "archetype": "Stance" },
+    { "id": "jade_cicada", "name": "Jade Cicada", "description": "When HP is below 50%, gain 1 Artifact at combat start.", "rarity": "Boss", "archetype": "Survival" },
+    { "id": "ember_chisel", "name": "Ember Chisel", "description": "Whenever you Exhaust a card, gain 1 temporary Strength this turn.", "rarity": "Uncommon", "archetype": "Exhaust" }
+  ]
+}

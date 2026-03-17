@@ -30,5 +30,8 @@
     <Content Include="..\..\Data\enemies.json" Link="Data\enemies.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\Data\relics.json" Link="Data\relics.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>
