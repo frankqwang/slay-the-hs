@@ -10,11 +10,35 @@
     },
     {
       "id": "cultist_scout",
-      "displayName": "Cultist",
+      "displayName": "Scout",
       "visualId": "cultist",
       "nameTemplate": "{displayName} {suffix}",
       "baseHp": 32,
       "hpPerFloor": 6
+    },
+    {
+      "id": "cultist_shaman",
+      "displayName": "Shaman",
+      "visualId": "cultist",
+      "nameTemplate": "{displayName} {suffix}",
+      "baseHp": 28,
+      "hpPerFloor": 5
+    },
+    {
+      "id": "cultist_guard",
+      "displayName": "Guard",
+      "visualId": "cultist",
+      "nameTemplate": "{displayName} {suffix}",
+      "baseHp": 40,
+      "hpPerFloor": 7
+    },
+    {
+      "id": "cultist_brute",
+      "displayName": "Brute",
+      "visualId": "cultist",
+      "nameTemplate": "{displayName} {suffix}",
+      "baseHp": 50,
+      "hpPerFloor": 9
     },
     {
       "id": "elite_sentinel",
@@ -28,13 +52,13 @@
   "encounters": {
     "NormalBattle": [
       {
-        "archetypeId": "cultist",
+        "archetypeId": "cultist_guard",
         "suffix": "A",
         "minFloor": 1,
         "strength": {
           "baseValue": 0,
           "floorMultiplier": 1,
-          "floorDivisor": 1,
+          "floorDivisor": 2,
           "floorOffset": -1,
           "minValue": 0
         }
@@ -52,15 +76,39 @@
         }
       },
       {
-        "archetypeId": "cultist_scout",
+        "archetypeId": "cultist_shaman",
         "suffix": "C",
-        "minFloor": 3,
+        "minFloor": 2,
         "strength": {
           "baseValue": 0,
           "floorMultiplier": 1,
-          "floorDivisor": 1,
+          "floorDivisor": 2,
           "floorOffset": -1,
           "minValue": 0
+        }
+      },
+      {
+        "archetypeId": "cultist_scout",
+        "suffix": "D",
+        "minFloor": 4,
+        "strength": {
+          "baseValue": 1,
+          "floorMultiplier": 1,
+          "floorDivisor": 2,
+          "floorOffset": -1,
+          "minValue": 1
+        }
+      },
+      {
+        "archetypeId": "cultist_brute",
+        "suffix": "E",
+        "minFloor": 6,
+        "strength": {
+          "baseValue": 1,
+          "floorMultiplier": 1,
+          "floorDivisor": 2,
+          "floorOffset": 0,
+          "minValue": 1
         }
       }
     ],
@@ -83,6 +131,18 @@
         "minFloor": 1,
         "strength": {
           "baseValue": 0,
+          "floorMultiplier": 1,
+          "floorDivisor": 2,
+          "floorOffset": 0,
+          "minValue": 1
+        }
+      },
+      {
+        "archetypeId": "cultist_shaman",
+        "suffix": "C",
+        "minFloor": 3,
+        "strength": {
+          "baseValue": 1,
           "floorMultiplier": 1,
           "floorDivisor": 2,
           "floorOffset": 0,

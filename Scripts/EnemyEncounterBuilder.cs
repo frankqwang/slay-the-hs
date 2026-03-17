@@ -36,6 +36,7 @@ public static class EnemyEncounterBuilder
         var hp = archetype.BaseHp + floor * archetype.HpPerFloor;
         return new EnemyUnit
         {
+            ArchetypeId = archetype.Id,
             Name = Catalog.BuildName(archetype, member.Suffix),
             VisualId = archetype.VisualId,
             Hp = hp,

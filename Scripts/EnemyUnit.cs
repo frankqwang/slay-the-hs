@@ -1,5 +1,6 @@
 public sealed class EnemyUnit
 {
+    public string ArchetypeId = "cultist";
     public string Name = "Enemy";
     public string VisualId = "cultist";
     public int Hp;

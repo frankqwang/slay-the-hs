@@ -492,7 +492,7 @@ public partial class BattleScene : Control
                 continue;
             }
 
-            var intent = IntentResolver.RollEnemyIntent(_isElite, _rng);
+            var intent = IntentResolver.RollEnemyIntent(enemy, _enemies, _isElite, _turn, _rng);
             enemy.IntentType = intent.Type;
             enemy.IntentValue = intent.Value;
         }

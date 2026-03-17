@@ -21,9 +21,12 @@ internal static class Program
             ("Draw stops at hand limit", TestDrawStopsAtHandLimit),
             ("Draw reshuffles discard when needed", TestDrawReshufflesDiscard),
             ("Draw halts when no cards available", TestDrawHaltsWhenNoCards),
-            ("Normal intent values stay in expected ranges", TestNormalIntentRanges),
-            ("Elite intent values stay in expected ranges", TestEliteIntentRanges),
-            ("Elite attack rate is higher than normal", TestEliteAttackRateHigher),
+            ("Default normal intent values stay in expected ranges", TestDefaultNormalIntentRanges),
+            ("Default elite intent values stay in expected ranges", TestDefaultEliteIntentRanges),
+            ("Shaman opens with buff in groups", TestShamanOpener),
+            ("Guard opens with defend", TestGuardOpener),
+            ("Brute buffs every third turn", TestBruteTurnCycle),
+            ("Elite sentinel follows 3-turn pattern", TestEliteSentinelTurnPattern),
             ("Normal encounter roster scales by floor", TestNormalEncounterRoster),
             ("Elite encounter roster scales by floor", TestEliteEncounterRoster),
             ("Card effects aggregate into legacy fields", TestCardEffectsAggregateLegacyFields),
@@ -189,12 +192,12 @@ internal static class Program
         ExpectEqual(false, result.HandLimitReached, nameof(result.HandLimitReached));
     }
 
-    private static void TestNormalIntentRanges()
+    private static void TestDefaultNormalIntentRanges()
     {
         var rng = new Random(1337);
         for (var i = 0; i < 5000; i++)
         {
-            var intent = IntentResolver.RollEnemyIntent(isElite: false, rng);
+            var intent = IntentResolver.RollEnemyIntent(new EnemyUnit { ArchetypeId = "cultist" }, new List<EnemyUnit> { new EnemyUnit { ArchetypeId = "cultist", Hp = 1 } }, isElite: false, turn: 1, rng);
             switch (intent.Type)
             {
                 case EnemyIntentType.Attack:
@@ -210,12 +213,12 @@ internal static class Program
         }
     }
 
-    private static void TestEliteIntentRanges()
+    private static void TestDefaultEliteIntentRanges()
     {
         var rng = new Random(2025);
         for (var i = 0; i < 5000; i++)
         {
-            var intent = IntentResolver.RollEnemyIntent(isElite: true, rng);
+            var intent = IntentResolver.RollEnemyIntent(new EnemyUnit { ArchetypeId = "unknown_elite" }, new List<EnemyUnit> { new EnemyUnit { ArchetypeId = "unknown_elite", Hp = 1 } }, isElite: true, turn: 1, rng);
             switch (intent.Type)
             {
                 case EnemyIntentType.Attack:
@@ -231,54 +234,79 @@ internal static class Program
         }
     }
 
-    private static void TestEliteAttackRateHigher()
+    private static void TestShamanOpener()
     {
-        const int sampleSize = 20000;
-        var normalRng = new Random(11);
-        var eliteRng = new Random(11);
-        var normalAttack = 0;
-        var eliteAttack = 0;
-
-        for (var i = 0; i < sampleSize; i++)
+        var shaman = new EnemyUnit { ArchetypeId = "cultist_shaman", Hp = 1 };
+        var allies = new List<EnemyUnit>
         {
-            if (IntentResolver.RollEnemyIntent(false, normalRng).Type == EnemyIntentType.Attack)
-            {
-                normalAttack++;
-            }
+            shaman,
+            new EnemyUnit { ArchetypeId = "cultist", Hp = 1 },
+            new EnemyUnit { ArchetypeId = "cultist_guard", Hp = 1 }
+        };
 
-            if (IntentResolver.RollEnemyIntent(true, eliteRng).Type == EnemyIntentType.Attack)
-            {
-                eliteAttack++;
-            }
-        }
+        var intent = IntentResolver.RollEnemyIntent(shaman, allies, isElite: false, turn: 1, new Random(9));
+        ExpectEqual(EnemyIntentType.Buff, intent.Type, "shaman opener type");
+        ExpectEqual(1, intent.Value, "shaman opener value");
+    }
 
-        var normalRate = normalAttack / (double)sampleSize;
-        var eliteRate = eliteAttack / (double)sampleSize;
-        ExpectInRange(normalRate, 0.55, 0.65, "normal attack rate");
-        ExpectInRange(eliteRate, 0.65, 0.75, "elite attack rate");
-        if (eliteRate <= normalRate)
+    private static void TestGuardOpener()
+    {
+        var guard = new EnemyUnit { ArchetypeId = "cultist_guard", Hp = 1 };
+        var allies = new List<EnemyUnit>
         {
-            throw new InvalidOperationException($"elite attack rate should be higher than normal: elite={eliteRate:F3}, normal={normalRate:F3}");
-        }
+            guard,
+            new EnemyUnit { ArchetypeId = "cultist", Hp = 1 }
+        };
+
+        var intent = IntentResolver.RollEnemyIntent(guard, allies, isElite: false, turn: 1, new Random(21));
+        ExpectEqual(EnemyIntentType.Defend, intent.Type, "guard opener type");
+        ExpectEqual(6, intent.Value, "guard opener value");
+    }
+
+    private static void TestBruteTurnCycle()
+    {
+        var brute = new EnemyUnit { ArchetypeId = "cultist_brute", Hp = 1 };
+        var allies = new List<EnemyUnit> { brute };
+
+        var turn3 = IntentResolver.RollEnemyIntent(brute, allies, isElite: false, turn: 3, new Random(5));
+        ExpectEqual(EnemyIntentType.Buff, turn3.Type, "brute turn3 type");
+        ExpectEqual(2, turn3.Value, "brute turn3 value");
+    }
+
+    private static void TestEliteSentinelTurnPattern()
+    {
+        var sentinel = new EnemyUnit { ArchetypeId = "elite_sentinel", Hp = 1 };
+        var allies = new List<EnemyUnit> { sentinel };
+
+        var turn1 = IntentResolver.RollEnemyIntent(sentinel, allies, isElite: true, turn: 1, new Random(3));
+        var turn2 = IntentResolver.RollEnemyIntent(sentinel, allies, isElite: true, turn: 2, new Random(3));
+        var turn3 = IntentResolver.RollEnemyIntent(sentinel, allies, isElite: true, turn: 3, new Random(3));
+
+        ExpectEqual(EnemyIntentType.Attack, turn1.Type, "sentinel turn1 type");
+        ExpectInRange(turn1.Value, 10, 15, "sentinel turn1 value");
+        ExpectEqual(EnemyIntentType.Defend, turn2.Type, "sentinel turn2 type");
+        ExpectEqual(12, turn2.Value, "sentinel turn2 value");
+        ExpectEqual(EnemyIntentType.Buff, turn3.Type, "sentinel turn3 type");
+        ExpectEqual(3, turn3.Value, "sentinel turn3 value");
     }
 
     private static void TestNormalEncounterRoster()
     {
         var early = EnemyEncounterBuilder.BuildEncounter(MapNodeType.NormalBattle, floor: 1);
         ExpectEqual(2, early.Count, "early.Count");
-        ExpectEqual("Cultist A", early[0].Name, "early[0].Name");
-        ExpectEqual(43, early[0].Hp, "early[0].Hp");
+        ExpectEqual("Guard A", early[0].Name, "early[0].Name");
+        ExpectEqual(47, early[0].Hp, "early[0].Hp");
 
-        var later = EnemyEncounterBuilder.BuildEncounter(MapNodeType.NormalBattle, floor: 3);
-        ExpectEqual(3, later.Count, "later.Count");
-        ExpectEqual("Cultist C", later[2].Name, "later[2].Name");
-        ExpectEqual(50, later[2].Hp, "later[2].Hp");
+        var later = EnemyEncounterBuilder.BuildEncounter(MapNodeType.NormalBattle, floor: 6);
+        ExpectEqual(5, later.Count, "later.Count");
+        ExpectEqual("Brute E", later[4].Name, "later[4].Name");
+        ExpectEqual(104, later[4].Hp, "later[4].Hp");
     }
 
     private static void TestEliteEncounterRoster()
     {
         var roster = EnemyEncounterBuilder.BuildEncounter(MapNodeType.EliteBattle, floor: 4);
-        ExpectEqual(2, roster.Count, "roster.Count");
+        ExpectEqual(3, roster.Count, "roster.Count");
         ExpectEqual("Elite Sentinel A", roster[0].Name, "roster[0].Name");
         ExpectEqual("elite_sentinel", roster[0].VisualId, "roster[0].VisualId");
         ExpectEqual(118, roster[0].Hp, "roster[0].Hp");
