@@ -112,12 +112,9 @@ public sealed class EnemyEncounterCatalog
         candidates.AddRange(EnumerateExportDataCandidates(AppContext.BaseDirectory));
         candidates.AddRange(EnumerateExportDataCandidates(Directory.GetCurrentDirectory()));
 
-        foreach (var path in candidates.Distinct())
+        if (GameDataAccess.TryReadText(candidates, new[] { "res://Data/enemies.json" }, out var json, out var source))
         {
-            if (File.Exists(path))
-            {
-                return (File.ReadAllText(path), path);
-            }
+            return (json, source);
         }
 
         throw new FileNotFoundException("Cannot locate Data/enemies.json for enemy encounter loading.");

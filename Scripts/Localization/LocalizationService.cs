@@ -1,8 +1,6 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Text.Json;
 
 public enum GameLanguage
@@ -69,13 +67,12 @@ public static class LocalizationService
 
     private static void LoadLanguage(GameLanguage language, string fileName, Dictionary<string, string> target)
     {
-        var absolutePath = GetAbsoluteResourcePath($"Data/Localization/{fileName}");
-        if (!File.Exists(absolutePath))
+        var resourcePath = $"res://Data/Localization/{fileName}";
+        if (!GameDataAccess.TryReadResourceText(resourcePath, out var json))
         {
             return;
         }
 
-        var json = File.ReadAllText(absolutePath, Encoding.UTF8);
         Dictionary<string, string>? dict;
         try
         {
@@ -95,29 +92,7 @@ public static class LocalizationService
             target[kv.Key] = kv.Value;
         }
 
-        GD.Print($"Loaded {language}: {dict.Count} entries from {fileName}");
-    }
-
-    private static string GetAbsoluteResourcePath(string relativeToRes)
-    {
-        if (string.Equals(
-            System.Environment.GetEnvironmentVariable("SLAY_HS_SKIP_GODOT_RESOURCE_CHECKS"),
-            "1",
-            StringComparison.Ordinal))
-        {
-            var normalized = relativeToRes.Replace('\\', Path.DirectorySeparatorChar);
-            var baseDir = AppContext.BaseDirectory;
-            var direct = Path.Combine(baseDir, normalized);
-            if (File.Exists(direct))
-            {
-                return direct;
-            }
-
-            var projectRoot = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", ".."));
-            return Path.Combine(projectRoot, normalized);
-        }
-
-        return ProjectSettings.GlobalizePath($"res://{relativeToRes.Replace('\\', '/')}");
+        GD.Print($"Loaded {language}: {dict.Count} entries from {resourcePath}");
     }
 
     public static void EnsureLoaded()

@@ -38,6 +38,8 @@ public sealed class CardEffectEntryData
 
 public static class CardCatalogPersistence
 {
+    private const string CardsResourcePath = "res://Data/cards.json";
+
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -46,6 +48,11 @@ public static class CardCatalogPersistence
 
     public static string ResolveCardsJsonPath()
     {
+        if (GameDataAccess.TryReadResourceText(CardsResourcePath, out _))
+        {
+            return CardsResourcePath;
+        }
+
         var candidates = new List<string>();
 
         var envPath = Environment.GetEnvironmentVariable("SLAY_THE_HS_CARDS_JSON");
@@ -70,7 +77,9 @@ public static class CardCatalogPersistence
 
     public static CardCatalogData LoadFromFile(string path)
     {
-        var json = File.ReadAllText(path);
+        var json = path.StartsWith("res://", StringComparison.OrdinalIgnoreCase)
+            ? GameDataAccess.ReadResourceText(path)
+            : File.ReadAllText(path);
         return LoadFromJson(json, path);
     }
 

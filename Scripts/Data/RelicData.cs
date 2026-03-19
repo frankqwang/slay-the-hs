@@ -148,12 +148,9 @@ public sealed class RelicData
             candidates.AddRange(EnumerateTestProjectCandidates(AppContext.BaseDirectory));
             candidates.AddRange(EnumerateTestProjectCandidates(Directory.GetCurrentDirectory()));
 
-            foreach (var path in candidates.Distinct())
+            if (GameDataAccess.TryReadText(candidates, new[] { "res://Data/relics.json" }, out var json, out var source))
             {
-                if (File.Exists(path))
-                {
-                    return (File.ReadAllText(path), path);
-                }
+                return (json, source);
             }
 
             throw new FileNotFoundException("Cannot locate Data/relics.json for relic catalog loading.");
