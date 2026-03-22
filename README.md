@@ -7,7 +7,7 @@ https://github.com/user-attachments/assets/62f93228-8809-45c3-a432-a451aba46220
 之前自学游戏引擎unity ue什么的，真的，想要实现类似的逻辑，真的要花好久好久好久，  
 理解底层机制，逻辑编写，ui布局才能上手，起码几个月出去了，这个直接一天搞定，唯有震撼。
 
-## 训练AI打牌
+## 训练AI打牌（请注意，这部分ai训练流程代码，包括下述训练ai的指引文档也是ai生成的）
 
 
 https://github.com/user-attachments/assets/4c6d7eaa-08fb-4abe-99ff-614df744f8b4
