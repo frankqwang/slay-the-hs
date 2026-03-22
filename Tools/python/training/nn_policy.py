@@ -10,7 +10,11 @@ def relu(values: Sequence[float]) -> List[float]:
 
 
 def softmax(logits: Sequence[float], mask: Sequence[int] | None = None) -> List[float]:
-    allowed = [index for index, value in enumerate(logits) if mask is None or mask[index]]
+    allowed = [
+        index
+        for index, value in enumerate(logits)
+        if mask is None or (index < len(mask) and mask[index])
+    ]
     if not allowed:
         return [0.0 for _ in logits]
 
@@ -112,8 +116,8 @@ class TinyPolicyNetwork:
 
         grad_logits = probabilities[:]
         grad_logits[target_action_id] -= 1.0
-        for index, allowed in enumerate(action_mask):
-            if not allowed:
+        for index in range(self.output_dim):
+            if index >= len(action_mask) or not action_mask[index]:
                 grad_logits[index] = 0.0
 
         grad_output_input = [0.0 for _ in range(len(output_input))]

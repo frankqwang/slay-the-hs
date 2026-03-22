@@ -1202,6 +1202,7 @@ public partial class BattleScene : Control
         if (!requiresEnemyTarget)
         {
             PushInputLock();
+            var selfImpactCenter = view.GlobalPosition + view.Size * 0.5f;
             var playedSelf = await TrySpendAndApplyCard(view.Card);
             if (!playedSelf && IsInstanceValid(view))
             {
@@ -1211,6 +1212,7 @@ public partial class BattleScene : Control
             }
             else if (playedSelf)
             {
+                SpawnCardPlayImpact(selfImpactCenter, view.Card.Kind);
                 EmitUiSfx("card_play");
             }
             PopInputLock();
@@ -1271,7 +1273,8 @@ public partial class BattleScene : Control
 
         await view.AnimateToTarget(target);
 
-        SpawnCardTrail(fromPos, target + view.Size * 0.5f);
+        var impactCenter = target + view.Size * 0.5f;
+        SpawnCardTrail(fromPos, impactCenter);
         var played = await TrySpendAndApplyCard(view.Card);
         if (!played && IsInstanceValid(view))
         {
@@ -1281,6 +1284,7 @@ public partial class BattleScene : Control
         }
         else if (played)
         {
+            SpawnCardPlayImpact(impactCenter, view.Card.Kind);
             EmitUiSfx("card_play");
         }
         PopInputLock();
@@ -1322,14 +1326,16 @@ public partial class BattleScene : Control
         {
             SpawnCardTrail(fromPos, toPos);
         }
-        if (!await TrySpendAndApplyCard(view.Card) && IsInstanceValid(view))
+        var playedClick = await TrySpendAndApplyCard(view.Card);
+        if (!playedClick && IsInstanceValid(view))
         {
             EmitUiSfx("card_cancel");
             await view.AnimateBackToHand();
             LayoutHandCards(true);
         }
-        else
+        else if (playedClick)
         {
+            SpawnCardPlayImpact(toPos, view.Card.Kind);
             EmitUiSfx("card_play");
         }
 
@@ -1580,6 +1586,17 @@ public partial class BattleScene : Control
                 return "Card play failed.";
             }
 
+            if (CardRequiresEnemyTarget(card))
+            {
+                var er = EnemyEffectTarget(_selectedEnemyIndex).GetGlobalRect();
+                SpawnCardPlayImpact(er.Position + er.Size * 0.5f, card.Kind);
+            }
+            else
+            {
+                var pr = _playerCardView.EffectTarget().GetGlobalRect();
+                SpawnCardPlayImpact(pr.Position + pr.Size * 0.5f, card.Kind);
+            }
+
             return null;
         }
         finally
@@ -1702,6 +1719,11 @@ public partial class BattleScene : Control
         var playerEffectTarget = _playerCardView.EffectTarget();
         Log(LocalizationService.Format("log.battle.play_gain_energy", "Play {0}: gain {1} Energy", card.GetLocalizedName(), effect.Amount), "#fde68a");
         SpawnFloatingText(playerEffectTarget, $"EN+{effect.Amount}", new Color("fde68a"));
+        SpawnEnergyRadialBurst(playerEffectTarget);
+        if (IsInstanceValid(_energyLabel))
+        {
+            PulseImpact(_energyLabel, 1.12f);
+        }
     }
 
     private void ApplyHealEffect(CardData card, CardEffectData effect)
@@ -1722,6 +1744,8 @@ public partial class BattleScene : Control
         var playerEffectTarget = _playerCardView.EffectTarget();
         Log(LocalizationService.Format("log.battle.play_heal", "Play {0}: heal {1}", card.GetLocalizedName(), gained), "#86efac");
         SpawnFloatingText(playerEffectTarget, $"+{gained} HP", new Color("86efac"));
+        SpawnHealSparkles(playerEffectTarget);
+        PulseImpact(_playerPanel, 1.035f);
     }
 
     private void ResolveDamageCardEffect(CardData card, CardEffectData effect, int relicAttackBonus)
@@ -1887,24 +1911,33 @@ public partial class BattleScene : Control
 
     private void SpawnSlashEffect(Control target, Color color)
     {
+        SpawnSlashStripe(target, color, new Vector2(88f, 11f), -21f);
+        SpawnSlashStripe(target, new Color(color.R, color.G, color.B, color.A * 0.72f), new Vector2(62f, 8f), 38f);
+    }
+
+    private void SpawnSlashStripe(Control target, Color color, Vector2 size, float rotationDegrees)
+    {
         var rect = new ColorRect
         {
             Color = color,
-            Size = new Vector2(86, 10),
+            Size = size,
             TopLevel = true,
             ZIndex = 180
         };
         _effectsLayer.AddChild(rect);
 
         var area = target.GetGlobalRect();
-        rect.GlobalPosition = new Vector2(area.Position.X + area.Size.X * 0.5f - 43f, area.Position.Y + area.Size.Y * 0.45f);
-        rect.RotationDegrees = -22f;
+        var cx = area.Position.X + area.Size.X * 0.5f;
+        var cy = area.Position.Y + area.Size.Y * 0.45f;
+        rect.GlobalPosition = new Vector2(cx - size.X * 0.5f, cy - size.Y * 0.5f);
+        rect.RotationDegrees = rotationDegrees;
+        rect.PivotOffset = size * 0.5f;
 
         var tween = CreateTween();
         tween.SetEase(Tween.EaseType.Out);
         tween.SetTrans(Tween.TransitionType.Quad);
-        tween.TweenProperty(rect, "scale", new Vector2(1.3f, 1f), 0.12f);
-        tween.Parallel().TweenProperty(rect, "modulate:a", 0f, 0.18f);
+        tween.TweenProperty(rect, "scale", new Vector2(1.38f, 1f), 0.11f);
+        tween.Parallel().TweenProperty(rect, "modulate:a", 0f, 0.19f);
         tween.Finished += () =>
         {
             if (IsInstanceValid(rect))
@@ -1912,6 +1945,240 @@ public partial class BattleScene : Control
                 rect.QueueFree();
             }
         };
+    }
+
+    private void SpawnHealSparkles(Control target)
+    {
+        if (IsFastMode)
+        {
+            return;
+        }
+
+        var area = target.GetGlobalRect();
+        var center = new Vector2(area.Position.X + area.Size.X * 0.5f, area.Position.Y + area.Size.Y * 0.42f);
+        var baseColor = new Color("86efac");
+
+        for (var i = 0; i < 7; i++)
+        {
+            var spark = new ColorRect
+            {
+                Color = new Color(baseColor.R, baseColor.G, baseColor.B, 0.88f),
+                Size = new Vector2(5f, 5f),
+                TopLevel = true,
+                ZIndex = 182
+            };
+            _effectsLayer.AddChild(spark);
+
+            var ox = (float)(_rng.NextDouble() * 56.0 - 28.0);
+            var oy = (float)(_rng.NextDouble() * 18.0 - 6.0);
+            spark.GlobalPosition = center + new Vector2(ox - 2.5f, oy - 2.5f);
+
+            var tween = CreateTween();
+            tween.SetEase(Tween.EaseType.Out);
+            tween.SetTrans(Tween.TransitionType.Cubic);
+            var rise = 36f + (float)(_rng.NextDouble() * 22.0);
+            var drift = (float)(_rng.NextDouble() * 24.0 - 12.0);
+            tween.TweenProperty(spark, "global_position", spark.GlobalPosition + new Vector2(drift, -rise), 0.38f);
+            tween.Parallel().TweenProperty(spark, "modulate:a", 0f, 0.38f);
+            tween.Parallel().TweenProperty(spark, "rotation_degrees", (float)(_rng.NextDouble() * 80.0 - 40.0), 0.38f);
+            var captured = spark;
+            tween.Finished += () =>
+            {
+                if (IsInstanceValid(captured))
+                {
+                    captured.QueueFree();
+                }
+            };
+        }
+    }
+
+    private void SpawnEnergyRadialBurst(Control target)
+    {
+        if (IsFastMode)
+        {
+            return;
+        }
+
+        var area = target.GetGlobalRect();
+        var center = new Vector2(area.Position.X + area.Size.X * 0.5f, area.Position.Y + area.Size.Y * 0.48f);
+        var tint = new Color("fde68a");
+
+        var core = new ColorRect
+        {
+            Color = new Color(tint.R, tint.G, tint.B, 0.55f),
+            Size = new Vector2(36f, 36f),
+            TopLevel = true,
+            ZIndex = 181
+        };
+        _effectsLayer.AddChild(core);
+        core.GlobalPosition = center - core.Size * 0.5f;
+        core.PivotOffset = core.Size * 0.5f;
+
+        var coreTween = CreateTween();
+        coreTween.SetEase(Tween.EaseType.Out);
+        coreTween.SetTrans(Tween.TransitionType.Cubic);
+        coreTween.TweenProperty(core, "scale", new Vector2(2.4f, 2.4f), 0.2f);
+        coreTween.Parallel().TweenProperty(core, "modulate:a", 0f, 0.22f);
+        coreTween.Finished += () =>
+        {
+            if (IsInstanceValid(core))
+            {
+                core.QueueFree();
+            }
+        };
+
+        for (var i = 0; i < 6; i++)
+        {
+            var ray = new ColorRect
+            {
+                Color = new Color(tint.R, tint.G, tint.B, 0.65f),
+                Size = new Vector2(46f, 4f),
+                TopLevel = true,
+                ZIndex = 180
+            };
+            _effectsLayer.AddChild(ray);
+            ray.GlobalPosition = center - new Vector2(0f, ray.Size.Y * 0.5f);
+            ray.PivotOffset = new Vector2(0f, ray.Size.Y * 0.5f);
+            ray.RotationDegrees = i * 60f;
+
+            var rt = CreateTween();
+            rt.SetEase(Tween.EaseType.Out);
+            rt.SetTrans(Tween.TransitionType.Quad);
+            rt.TweenProperty(ray, "scale:x", 1.65f, 0.16f);
+            rt.Parallel().TweenProperty(ray, "modulate:a", 0f, 0.2f);
+            var capturedRay = ray;
+            rt.Finished += () =>
+            {
+                if (IsInstanceValid(capturedRay))
+                {
+                    capturedRay.QueueFree();
+                }
+            };
+        }
+    }
+
+    private void SpawnDrawPileFlash()
+    {
+        if (IsFastMode || !IsInstanceValid(_drawAnchor))
+        {
+            return;
+        }
+
+        var area = _drawAnchor.GetGlobalRect();
+        var center = area.Position + area.Size * 0.5f;
+        var ring = new ColorRect
+        {
+            Color = new Color(0.49f, 0.83f, 0.99f, 0.28f),
+            Size = new Vector2(48f, 48f),
+            TopLevel = true,
+            ZIndex = 165
+        };
+        _effectsLayer.AddChild(ring);
+        ring.GlobalPosition = center - ring.Size * 0.5f;
+        ring.PivotOffset = ring.Size * 0.5f;
+
+        var tween = CreateTween();
+        tween.SetEase(Tween.EaseType.Out);
+        tween.SetTrans(Tween.TransitionType.Cubic);
+        tween.TweenProperty(ring, "scale", new Vector2(2.1f, 2.1f), 0.24f);
+        tween.Parallel().TweenProperty(ring, "modulate:a", 0f, 0.26f);
+        tween.Finished += () =>
+        {
+            if (IsInstanceValid(ring))
+            {
+                ring.QueueFree();
+            }
+        };
+    }
+
+    private void SpawnCardPlayImpact(Vector2 globalCenter, CardKind kind)
+    {
+        if (IsFastMode)
+        {
+            return;
+        }
+
+        var primary = kind == CardKind.Attack ? new Color("fb923c") : new Color("7dd3fc");
+        var glow = kind == CardKind.Attack ? new Color("fecaca") : new Color("bae6fd");
+
+        var core = new ColorRect
+        {
+            Color = new Color(primary.R, primary.G, primary.B, 0.62f),
+            Size = new Vector2(28f, 28f),
+            TopLevel = true,
+            ZIndex = 178
+        };
+        _effectsLayer.AddChild(core);
+        core.GlobalPosition = globalCenter - core.Size * 0.5f;
+        core.PivotOffset = core.Size * 0.5f;
+
+        var coreTween = CreateTween();
+        coreTween.SetEase(Tween.EaseType.Out);
+        coreTween.SetTrans(Tween.TransitionType.Back);
+        coreTween.TweenProperty(core, "scale", new Vector2(2.15f, 2.15f), 0.14f);
+        coreTween.Parallel().TweenProperty(core, "modulate:a", 0f, 0.2f);
+        coreTween.Finished += () =>
+        {
+            if (IsInstanceValid(core))
+            {
+                core.QueueFree();
+            }
+        };
+
+        var ring = new ColorRect
+        {
+            Color = new Color(glow.R, glow.G, glow.B, 0.35f),
+            Size = new Vector2(40f, 40f),
+            TopLevel = true,
+            ZIndex = 177
+        };
+        _effectsLayer.AddChild(ring);
+        ring.GlobalPosition = globalCenter - ring.Size * 0.5f;
+        ring.PivotOffset = ring.Size * 0.5f;
+
+        var ringTween = CreateTween();
+        ringTween.SetEase(Tween.EaseType.Out);
+        ringTween.SetTrans(Tween.TransitionType.Cubic);
+        ringTween.TweenProperty(ring, "scale", new Vector2(2.45f, 2.45f), 0.2f);
+        ringTween.Parallel().TweenProperty(ring, "modulate:a", 0f, 0.22f);
+        ringTween.Finished += () =>
+        {
+            if (IsInstanceValid(ring))
+            {
+                ring.QueueFree();
+            }
+        };
+
+        for (var i = 0; i < 9; i++)
+        {
+            var spark = new ColorRect
+            {
+                Color = new Color(primary.R, primary.G, primary.B, 0.78f),
+                Size = new Vector2(6f, 6f),
+                TopLevel = true,
+                ZIndex = 179
+            };
+            _effectsLayer.AddChild(spark);
+            spark.GlobalPosition = globalCenter - spark.Size * 0.5f;
+            spark.PivotOffset = spark.Size * 0.5f;
+            var angle = i * (Mathf.Tau / 9f);
+            var dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+
+            var st = CreateTween();
+            st.SetEase(Tween.EaseType.Out);
+            st.SetTrans(Tween.TransitionType.Quad);
+            st.TweenProperty(spark, "global_position", globalCenter - spark.Size * 0.5f + dir * (42f + (float)(_rng.NextDouble() * 14.0)), 0.18f);
+            st.Parallel().TweenProperty(spark, "modulate:a", 0f, 0.2f);
+            st.Parallel().TweenProperty(spark, "rotation_degrees", (float)(_rng.NextDouble() * 240.0 - 120.0), 0.2f);
+            var captured = spark;
+            st.Finished += () =>
+            {
+                if (IsInstanceValid(captured))
+                {
+                    captured.QueueFree();
+                }
+            };
+        }
     }
 
     private void SpawnShieldEffect(Control target, Color color)
@@ -2233,6 +2500,8 @@ public partial class BattleScene : Control
             return;
         }
 
+        SpawnDrawPileFlash();
+
         var drawRect = _drawAnchor.GetGlobalRect();
         var basePos = new Vector2(drawRect.Position.X + drawRect.Size.X * 0.5f, drawRect.Position.Y + drawRect.Size.Y * 0.5f);
         var tasks = new List<Task>();
@@ -2425,9 +2694,24 @@ public partial class BattleScene : Control
         centerX = _handContainer.Size.X * 0.5f + _handArcCenterOffsetX;
         pivotOffset = new Vector2(cardSize.X * 0.5f, cardSize.Y * _handPivotYOffsetFactor);
         pivotBaseY = _handContainer.Size.Y - (cardSize.Y - pivotOffset.Y) - _handBottomPadding;
+        pivotBaseY += cardSize.Y * 0.25f;
         var spreadFactor = Mathf.Clamp((count - 1) / 7f, 0f, 1f);
         maxAngle = Mathf.DegToRad(Mathf.Lerp(_handArcAngleMinDegrees, _handArcAngleMaxDegrees, spreadFactor));
+        if (count >= 5)
+        {
+            maxAngle *= 1.25f;
+        }
+
         radius = Mathf.Lerp(_handArcRadiusMax, _handArcRadiusMin, spreadFactor);
+        // Few cards used to keep almost the full radius while only spanning a small arc, so pivots sat near
+        // the left/right extremes of a huge circle (~2*R*sin(θ) with large R). Tighten radius until the
+        // hand grows so 2–3 cards cluster toward the middle instead of hugging the hand panel edges.
+        if (count >= 2)
+        {
+            var fewCardRadiusMul = Mathf.Clamp(0.28f + (count - 2) * 0.12f, 0.28f, 1f);
+            radius *= fewCardRadiusMul;
+        }
+
         startAngle = -maxAngle;
         angleStep = count <= 1 ? 0f : (maxAngle * 2f) / (count - 1);
     }

@@ -103,7 +103,7 @@ class TinyActorCritic:
         grad_logits = [0.0 for _ in range(self.output_dim)]
         if policy_scale != 0.0:
             for index in range(self.output_dim):
-                if not action_mask[index]:
+                if index >= len(action_mask) or not action_mask[index]:
                     continue
                 indicator = 1.0 if index == action_id else 0.0
                 grad_logits[index] = policy_scale * (indicator - probabilities[index]) * -1.0

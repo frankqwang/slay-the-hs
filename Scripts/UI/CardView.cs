@@ -27,6 +27,7 @@ public partial class CardView : PanelContainer
     private bool _useTopLevel = true;
     private bool _dragEnabled = true;
     private float _pivotYOffsetFactor = 0.88f;
+    private StyleBoxFlat? _panelStyle;
     private static readonly System.Collections.Generic.Dictionary<string, Texture2D> ArtCache = new();
 
     public bool IsDragging => _dragging;
@@ -124,6 +125,8 @@ public partial class CardView : PanelContainer
         {
             RefreshText();
         }
+
+        ApplyPanelChrome();
     }
 
     public override void _ExitTree()
@@ -157,6 +160,7 @@ public partial class CardView : PanelContainer
     {
         _playable = playable;
         UpdateModulate();
+        ApplyPanelChrome();
     }
 
     public void ApplyGlobalPositionDelta(Vector2 delta)
@@ -174,6 +178,7 @@ public partial class CardView : PanelContainer
         _hoverFocused = focused;
         _hoverDimmed = dimmed;
         UpdateModulate();
+        ApplyPanelChrome();
     }
 
     public void PrepareForReuse()
@@ -193,6 +198,7 @@ public partial class CardView : PanelContainer
         _targetRotationDegrees = 0f;
         _targetScale = Vector2.One;
         UpdateModulate();
+        ApplyPanelChrome();
     }
 
     public override void _GuiInput(InputEvent @event)
@@ -438,6 +444,7 @@ public partial class CardView : PanelContainer
             ShadowColor = new Color(0f, 0f, 0f, 0.45f),
             ShadowSize = 5
         };
+        _panelStyle = style;
         AddThemeStyleboxOverride("panel", style);
 
         var margin = new MarginContainer();
@@ -508,6 +515,55 @@ public partial class CardView : PanelContainer
         vbox.AddChild(_descLabel);
 
         RefreshText();
+        ApplyPanelChrome();
+    }
+
+    private void ApplyPanelChrome()
+    {
+        if (_panelStyle == null)
+        {
+            return;
+        }
+
+        var kindBorder = Card.Kind == CardKind.Attack ? new Color("e0787d") : new Color("7aa8cf");
+        const int borderNormal = 2;
+        const int borderHighlight = 3;
+
+        if (_hoverFocused && _playable)
+        {
+            _panelStyle.BorderColor = new Color("fcd34d");
+            SetUniformBorderWidth(borderHighlight);
+            _panelStyle.ShadowSize = 9;
+            _panelStyle.ShadowColor = new Color(0f, 0f, 0f, 0.55f);
+        }
+        else if (_hoverFocused && !_playable)
+        {
+            _panelStyle.BorderColor = new Color("a8a29e");
+            SetUniformBorderWidth(borderHighlight);
+            _panelStyle.ShadowSize = 6;
+            _panelStyle.ShadowColor = new Color(0f, 0f, 0f, 0.42f);
+        }
+        else
+        {
+            var c = _hoverDimmed ? kindBorder * new Color(0.72f, 0.72f, 0.78f, 1f) : kindBorder;
+            _panelStyle.BorderColor = c;
+            SetUniformBorderWidth(borderNormal);
+            _panelStyle.ShadowSize = 5;
+            _panelStyle.ShadowColor = new Color(0f, 0f, 0f, 0.45f);
+        }
+    }
+
+    private void SetUniformBorderWidth(int width)
+    {
+        if (_panelStyle == null)
+        {
+            return;
+        }
+
+        _panelStyle.BorderWidthLeft = width;
+        _panelStyle.BorderWidthTop = width;
+        _panelStyle.BorderWidthRight = width;
+        _panelStyle.BorderWidthBottom = width;
     }
 
     private void ApplyPivotOffset()
